@@ -1,6 +1,7 @@
 package com.mrogotnev.ApiConsolidator;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
@@ -18,7 +19,8 @@ public class ProxmoxFirstAPIData {
     @Jacksonized
     @JsonIgnoreProperties(value = { "cap", "username" })
     private static class Data {
-        private String CSRFPreventionToken;
+        @JsonProperty("CSRFPreventionToken")
+        private String token;
         private String ticket;
     }
 
