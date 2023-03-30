@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.net.ssl.SSLException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 @RestController
@@ -21,13 +20,26 @@ public class Controller {
     private ProxmoxFirstAPIData proxmoxFirstAPIData;
     private ProxmoxCredentials proxmoxCredentials;
 
-    /*@GetMapping("/GetProxmoxAllTickets")
+    @GetMapping("/GetProxmoxAllTickets")
     public ArrayList<ProxmoxFirstAPIData> getProxmoxAllTickets() {
-        for (ProxmoxCredentials.ProxmoxServer currentCredentials : proxmoxCredentials.getProxmoxServers()) {
-            ProxmoxCredentials.ProxmoxServer objects = currentCredentials;
+        ArrayList<ProxmoxFirstAPIData> proxmoxFirstAPIDataList = new ArrayList<>();
+        for (ProxmoxCredentials.ProxmoxServer currentServer : proxmoxCredentials.getProxmoxServers() ) {
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            formData.add("username", currentServer.getLogin());
+            formData.add("password", currentServer.getPassword());
+
+            proxmoxFirstAPIData = webClient
+                    .post()
+                    .uri("https://"+ currentServer.getIp() + ":" + currentServer.getPort() + "/api2/json/access/ticket")
+                    .body(BodyInserters.fromFormData(formData))
+                    .exchange()
+                    .block()
+                    .bodyToMono(ProxmoxFirstAPIData.class)
+                    .block();
+            proxmoxFirstAPIDataList.add(proxmoxFirstAPIData);
         }
-        return null;
-    }*/
+        return proxmoxFirstAPIDataList;
+    }
     @GetMapping("/GetProxmoxTicket")
     public ProxmoxFirstAPIData getProxmoxTicket() throws SSLException {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
