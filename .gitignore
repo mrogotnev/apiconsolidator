@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### application.properties With passwords ###
-!**/src/main/resources/application.properties
+C:\Code\ApiConsolidator\src\main\resources\application.properties
