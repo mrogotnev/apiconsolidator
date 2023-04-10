@@ -2,16 +2,12 @@ package com.mrogotnev.ApiConsolidator.clients.proxmox;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
-import lombok.extern.jackson.Jacksonized;
 import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
 
 @Data
 @Component
-public class ProxmoxFirstAPIData {
+public class ProxmoxTicketAndToken {
     private Data data;
 
     @lombok.Data
