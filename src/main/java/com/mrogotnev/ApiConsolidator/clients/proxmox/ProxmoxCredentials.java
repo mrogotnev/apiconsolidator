@@ -17,7 +17,8 @@ public class ProxmoxCredentials {
     static class ProxmoxServer {
     private String ip;
     private String port;
-    private String login;
-    private String password;
+    private String userLogin;
+    private String tokenID;
+    private String tokenKey;
     }
 }

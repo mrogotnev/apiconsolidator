@@ -1,8 +1,6 @@
 package com.mrogotnev.ApiConsolidator.clients.proxmox;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 
 @Data
@@ -16,6 +14,5 @@ public class ProxmoxDatacenter {
         this.ip = ip;
         this.port = port;
         this.proxmoxTicketAndToken = proxmoxTicketAndToken;
-
     }
 }

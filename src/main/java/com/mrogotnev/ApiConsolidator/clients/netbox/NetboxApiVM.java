@@ -13,6 +13,8 @@ public class NetboxApiVM {
     private String previous;
     private ArrayList<NetboxVM> results;
 
+
+
     @Data
     public static class NetboxVM {
         private String name;
@@ -22,12 +24,21 @@ public class NetboxApiVM {
         private int disk;
         private Status status;
 
+        public String getClusterName() {
+            return cluster.getName();
+        }
+
+        public String getStatusValue() {
+            return status.getValue();
+        }
+
         @Data
         private static class Cluster {
             private long id;
             private String url;
             private String name;
         }
+
 
         @Data
         private static class Status {

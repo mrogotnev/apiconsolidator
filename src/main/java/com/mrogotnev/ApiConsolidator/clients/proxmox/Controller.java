@@ -13,25 +13,37 @@ import java.util.ArrayList;
 public class Controller {
     private ProxmoxService proxmoxService;
 
-    @GetMapping("/getAllProxmoxTickets")
+    /*@GetMapping("/getAllProxmoxTickets")
     public ArrayList<ProxmoxDatacenter> getAllProxmoxTickets() {
         return proxmoxService.getAllProxmoxTickets();
-    }
+    }*/
 
-    @GetMapping("/getAllNodeNames")
+    /*@GetMapping("/getAllNodeNames")
     public ArrayList<ProxmoxDatacenter> getAllNodeNames() {
         return proxmoxService.getAllNodeNames();
-    }
+    }*/
 
-    @GetMapping("/getAllProxmoxVM")
+    /*@GetMapping("/getAllProxmoxVM")
     public ArrayList<ProxmoxDatacenter> getAllProxmoxVM() {
         return proxmoxService.getAllProxmoxVM();
-    }
+    }*/
 
-    @GetMapping("/getAllData")
+    /*@GetMapping("/getAllData")
     public ArrayList<ProxmoxDatacenter> getAllData() {
+        //TODO: Need to refactor!
         getAllProxmoxTickets();
         getAllNodeNames();
+        //end
         return getAllProxmoxVM();
+    }*/
+
+    /*@GetMapping("/getMapperedProxVMS")
+    public ArrayList<ProxmoxVM> getMapperedProxVMS(){
+        return proxmoxService.getMapperedProxVMS();
+    }*/
+
+    @GetMapping("/getVMList")
+    public String getVMList() {
+        return proxmoxService.getVMList();
     }
 }

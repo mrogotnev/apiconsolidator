@@ -19,12 +19,29 @@ public class ProxmoxService {
     private ProxmoxTicketAndToken proxmoxTicketAndToken;
     private ProxmoxCredentials proxmoxCredentials;
     private ProxmoxNodeName proxmoxNodeName;
-    private ArrayList<ProxmoxDatacenter> proxmoxDatacenterList;
+    private ArrayList<ProxmoxDatacenter> proxmoxDatacenterList = new ArrayList<>();
     private ProxmoxApiVM proxmoxApiVM;
     private ProxmoxValidator proxmoxValidator;
+    private ProxmoxMapper proxmoxMapper;
 
-    public ArrayList<ProxmoxDatacenter> getAllProxmoxTickets() {
-        proxmoxDatacenterList = new ArrayList<>();
+    public String getVMList() {
+        String res = "";
+        for (ProxmoxCredentials.ProxmoxServer currentServer : proxmoxCredentials.getProxmoxServers()) {
+             res = webClientWithoutSSL
+                    .get()
+                    .uri("https://" + currentServer.getIp() + ":" + currentServer.getPort() + "/api2/json/")
+                    .header("Authorization", "PVEAPIToken=" +
+                            currentServer.getUserLogin() + "!" +
+                            currentServer.getTokenID() + "=" +
+                            currentServer.getTokenKey())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }
+        return res;
+    }
+
+    /*public ArrayList<ProxmoxDatacenter> getAllProxmoxTickets() {
         for (ProxmoxCredentials.ProxmoxServer currentServer : proxmoxCredentials.getProxmoxServers()) {
 
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -42,9 +59,9 @@ public class ProxmoxService {
 
         }
         return proxmoxDatacenterList;
-    }
+    }*/
 
-    public ArrayList<ProxmoxDatacenter> getAllNodeNames() {
+    /*public ArrayList<ProxmoxDatacenter> getAllNodeNames() {
         for (ProxmoxDatacenter currentDatacenter : proxmoxDatacenterList) {
             proxmoxNodeName = webClientWithoutSSL.get()
                     .uri("https://" + currentDatacenter.getIp() + ":" + currentDatacenter.getPort() + "/api2/json/cluster/status")
@@ -58,9 +75,9 @@ public class ProxmoxService {
             }
         }
         return proxmoxDatacenterList;
-    }
+    }*/
 
-    public ArrayList<ProxmoxDatacenter> getAllProxmoxVM() {
+    /*public ArrayList<ProxmoxDatacenter> getAllProxmoxVM() {
         for (ProxmoxDatacenter currentDatacenter : proxmoxDatacenterList) {
             for (ProxmoxNode currentNode : currentDatacenter.getProxmoxNodeArrayList()) {
                 proxmoxApiVM = webClientWithoutSSL.get()
@@ -75,5 +92,13 @@ public class ProxmoxService {
             }
         }
         return proxmoxDatacenterList;
-    }
+    }*/
+
+    /*public ArrayList<ProxmoxVM> getMapperedProxVMS(){
+        //TODO: Need to refactor!
+        getAllProxmoxTickets();
+        getAllNodeNames();
+        //end
+        return proxmoxMapper.proxmoxApiVMToProxmoxVM(getAllProxmoxVM());
+    }*/
 }
