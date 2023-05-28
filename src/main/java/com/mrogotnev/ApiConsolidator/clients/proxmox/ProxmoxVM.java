@@ -8,6 +8,6 @@ public class ProxmoxVM {
     private String cluster;
     private double vcpu;
     private long memory;
-    private int disk;
+    private long disk;
     private String status;
 }

@@ -3,27 +3,39 @@ package com.mrogotnev.ApiConsolidator.clients.proxmox;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 @Data
 @Component
 public class ProxmoxMapper {
-    private ArrayList<ProxmoxVM> proxmoxVMArrayList = new ArrayList<>();
-    public ArrayList<ProxmoxVM> proxmoxApiVMToProxmoxVM (ArrayList<ProxmoxDatacenter> proxmoxDatacenterList) {
-        for(ProxmoxDatacenter currentDatacenter : proxmoxDatacenterList) {
-            for (ProxmoxNode currentNode : currentDatacenter.getProxmoxNodeArrayList()) {
-                for (ProxmoxApiVM.ProxmoxVM currentVM : currentNode.getVmArrayList()) {
-                    ProxmoxVM proxmoxVM = new ProxmoxVM();
-                    proxmoxVM.setName(currentVM.getName());
-                    proxmoxVM.setCluster(currentNode.getName());
-                    proxmoxVM.setVcpu(currentVM.getCpus());
-                    proxmoxVM.setMemory(currentVM.getMaxmem());
-                    proxmoxVM.setDisk((int) (currentVM.getMaxdisk()/Math.pow(1024, 3)));
-                    proxmoxVM.setStatus(currentVM.getStatus());
-                    proxmoxVMArrayList.add(proxmoxVM);
+    private HashMap<String, LinkedList<ProxmoxVM>> proxmoxVMHashMap = new HashMap<>();
+
+    public HashMap<String, LinkedList<ProxmoxVM>> ProxmoxVMApiListToSimpleProxmoxVmHashMap(ProxmoxDatacenter proxmoxDatacenter) {
+        for (ProxmoxNode currentNode : proxmoxDatacenter.getProxmoxNodes()) {
+            for (ProxmoxApiVM currentApiVMData : currentNode.getVmArrayList()) {
+                for (ProxmoxApiVM.ProxmoxVM currentVM : currentApiVMData.getData()) {
+                    addVmToHashMap(proxmoxVMHashMap, proxmoxVMApiToSimpleProxmoxVM(currentVM, currentNode.getName()));
                 }
             }
         }
-        return proxmoxVMArrayList;
+        return proxmoxVMHashMap;
     }
+    public ProxmoxVM proxmoxVMApiToSimpleProxmoxVM(ProxmoxApiVM.ProxmoxVM proxmoxVMFromApi, String clusterName) {
+        ProxmoxVM proxmoxVM = new ProxmoxVM();
+        proxmoxVM.setName(proxmoxVMFromApi.getName());
+        proxmoxVM.setVcpu(proxmoxVMFromApi.getCpus());
+        proxmoxVM.setMemory(proxmoxVMFromApi.getMaxmem());
+        proxmoxVM.setDisk(proxmoxVMFromApi.getMaxmem());
+        proxmoxVM.setStatus(proxmoxVMFromApi.getStatus());
+        proxmoxVM.setCluster(clusterName);
+        return proxmoxVM;
+    }
+    public void addVmToHashMap(HashMap<String, LinkedList<ProxmoxVM>> proxmoxVMHashMap, ProxmoxVM proxmoxVM) {
+        if (!proxmoxVMHashMap.containsKey(proxmoxVM.getName())) {
+            proxmoxVMHashMap.put(proxmoxVM.getName(), new LinkedList<ProxmoxVM>());
+        }
+        proxmoxVMHashMap.get(proxmoxVM.getName()).add(proxmoxVM);
+    }
+
 }

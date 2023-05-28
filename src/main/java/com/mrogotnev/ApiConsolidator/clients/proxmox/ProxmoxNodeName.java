@@ -9,7 +9,6 @@ import java.util.ArrayList;
 @Data
 @Component
 public class ProxmoxNodeName {
-
     private ArrayList<Data> data;
 
     @lombok.Data

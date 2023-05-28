@@ -33,7 +33,13 @@ public class NetboxApiVM {
         }
 
         @Data
-        private static class Cluster {
+        static class Cluster {
+            public Cluster() {
+            }
+            public Cluster(String name) {
+                this.name = name;
+            }
+
             private long id;
             private String url;
             private String name;
@@ -41,7 +47,14 @@ public class NetboxApiVM {
 
 
         @Data
-        private static class Status {
+        static class Status {
+            public Status() {
+            }
+
+            public Status(String value) {
+                this.value = value;
+            }
+
             private String value;
         }
 

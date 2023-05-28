@@ -11,14 +11,18 @@ import java.util.ArrayList;
 public class ProxmoxApiVM {
     private ArrayList<ProxmoxVM> data;
 
+    public ArrayList<ProxmoxVM> getData() {
+        return data;
+    }
+
     @lombok.Data
     @JsonIgnoreProperties(value = {"diskread", "diskwrite", "disk", "pid", "netin", "cpu", "netout", "uptime", "mem"})
-    public static class ProxmoxVM {
+    static class ProxmoxVM {
         private String name;
         private String vmid;
         private long maxdisk;
         private long maxmem;
-        private int cpus;
+        private double cpus;
         private String status;
     }
 }

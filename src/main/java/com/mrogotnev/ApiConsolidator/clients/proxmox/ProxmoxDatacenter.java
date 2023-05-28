@@ -5,14 +5,13 @@ import java.util.ArrayList;
 
 @Data
 public class ProxmoxDatacenter {
-    private String ip;
-    private String port;
-    private ProxmoxTicketAndToken proxmoxTicketAndToken;
-    private ArrayList<ProxmoxNode> proxmoxNodeArrayList = new ArrayList<>();
+    private ProxmoxCredentials.ProxmoxServer proxmoxServer;
+    private ProxmoxNodeName proxmoxNodeName;
+    private ArrayList<ProxmoxNode> proxmoxNodes = new ArrayList<>();
 
-    public ProxmoxDatacenter(String ip, String port, ProxmoxTicketAndToken proxmoxTicketAndToken) {
-        this.ip = ip;
-        this.port = port;
-        this.proxmoxTicketAndToken = proxmoxTicketAndToken;
+
+    public ProxmoxDatacenter(ProxmoxCredentials.ProxmoxServer proxmoxServer, ProxmoxNodeName proxmoxNodeName) {
+        this.proxmoxServer = proxmoxServer;
+        this.proxmoxNodeName = proxmoxNodeName;
     }
 }
