@@ -17,7 +17,7 @@ public class ProxmoxApiVM {
 
     @lombok.Data
     @JsonIgnoreProperties(value = {"diskread", "diskwrite", "disk", "pid", "netin", "cpu", "netout", "uptime", "mem"})
-    static class ProxmoxVM {
+    public static class ProxmoxVM {
         private String name;
         private String vmid;
         private long maxdisk;

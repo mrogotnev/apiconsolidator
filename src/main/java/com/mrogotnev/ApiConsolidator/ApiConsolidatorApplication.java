@@ -11,6 +11,4 @@ public class ApiConsolidatorApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ApiConsolidatorApplication.class, args);
 	}
-
-
 }

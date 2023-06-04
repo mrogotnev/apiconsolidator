@@ -13,8 +13,6 @@ public class NetboxApiVM {
     private String previous;
     private ArrayList<NetboxVM> results;
 
-
-
     @Data
     public static class NetboxVM {
         private String name;

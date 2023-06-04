@@ -1,5 +1,6 @@
 package com.mrogotnev.ApiConsolidator.clients.proxmox;
 
+import com.mrogotnev.ApiConsolidator.clients.proxmox.mappers.ProxmoxMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;

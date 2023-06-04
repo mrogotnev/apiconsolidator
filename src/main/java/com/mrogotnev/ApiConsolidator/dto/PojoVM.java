@@ -1,13 +1,14 @@
-package com.mrogotnev.ApiConsolidator.clients.proxmox;
+package com.mrogotnev.ApiConsolidator.dto;
 
 import lombok.Data;
 
 @Data
-public class ProxmoxVM {
+public class PojoVM {
     private String name;
     private String cluster;
+    private long clusterId;
     private double vcpu;
     private long memory;
-    private long disk;
+    private int disk;
     private String status;
 }

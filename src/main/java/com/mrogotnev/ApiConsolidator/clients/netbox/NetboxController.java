@@ -1,7 +1,7 @@
 package com.mrogotnev.ApiConsolidator.clients.netbox;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mrogotnev.ApiConsolidator.clients.dto.PojoVM;
+import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,18 +13,15 @@ import java.util.HashMap;
 @AllArgsConstructor
 public class NetboxController {
     private NetboxService netboxService;
-    @GetMapping("/netboxTestData")
-    public NetboxApiVM netboxTestData() {
-        return netboxService.getNetboxAPIVm();
+
+    @GetMapping("/getClusters")
+    public HashMap<String, Long> getClusters() {
+        return netboxService.getPojoNetboxClusters();
     }
 
-    @GetMapping("/getNetboxVMS")
-    public ArrayList<PojoVM> getNetboxVMS() throws JsonProcessingException {
-        return netboxService.getNetboxVMS();
+    @GetMapping("/getVMs")
+    public HashMap<String, PojoVM> getVMs() {
+        return netboxService.getPojoNetboxVM();
     }
 
-    @GetMapping("/getApiClusters")
-    public HashMap<String, Long> test() {
-        return netboxService.getNetboxClusters();
-    }
 }

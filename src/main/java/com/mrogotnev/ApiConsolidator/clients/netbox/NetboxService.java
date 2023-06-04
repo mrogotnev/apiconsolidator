@@ -1,15 +1,14 @@
 package com.mrogotnev.ApiConsolidator.clients.netbox;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mrogotnev.ApiConsolidator.clients.dto.PojoVM;
-import com.mrogotnev.ApiConsolidator.clients.mappers.NetboxMapper;
+import com.mrogotnev.ApiConsolidator.clients.netbox.mappers.NetboxMapper;
+import com.mrogotnev.ApiConsolidator.dto.PojoNetboxCluster;
+import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 @AllArgsConstructor
@@ -21,8 +20,8 @@ public class NetboxService {
     private NetboxApiVM netboxApiVM;
     private NetboxMapper netboxMapper;
     private NetboxApiCluster netboxApiCluster;
-
-    private ArrayList<NetboxCluster> netboxClusterArrayList = new ArrayList<>();
+    private HashMap<String, Long> netboxPojoClustersMap = new HashMap<>();
+    private HashMap<String, PojoVM> netboxPojoVM = new HashMap<>();
 
     public NetboxApiCluster getNetboxAPIClusters() {
         netboxApiCluster = webClientWithoutSSL
@@ -37,12 +36,6 @@ public class NetboxService {
                 .block();
         return netboxApiCluster;
     }
-
-    public HashMap<String, Long> getNetboxClusters() {
-        getNetboxAPIClusters();
-        return netboxMapper.netboxApiClusterToNetboxCluster(netboxApiCluster);
-    }
-
     public NetboxApiVM getNetboxAPIVm() {
         netboxApiVM = webClientWithoutSSL
                 .get()
@@ -57,13 +50,24 @@ public class NetboxService {
         return netboxApiVM;
     }
 
-    public ArrayList<PojoVM> getNetboxVMS() throws JsonProcessingException {
-        getNetboxClusters();
-        getNetboxAPIVm();
-        return netboxMapper.netboxApiVMToPojoVM(getNetboxAPIVm());
+    public HashMap<String, Long> getPojoNetboxClusters() {
+        getNetboxAPIClusters();
+        for (NetboxApiCluster.ApiCluster currentApiCluster : netboxApiCluster.getResults()) {
+            PojoNetboxCluster cluster = netboxMapper.netboxApiClusterToNetboxCluster(currentApiCluster);
+            netboxPojoClustersMap.put(cluster.getName(), cluster.getId());
+        }
+        return netboxPojoClustersMap;
     }
 
-    public boolean addNetboxAPIVm() throws JsonProcessingException {
-        return true;
+    public HashMap<String, PojoVM> getPojoNetboxVM() {
+        getNetboxAPIVm();
+        if(netboxPojoClustersMap.isEmpty()) {
+            getPojoNetboxClusters();
+        }
+        for (NetboxApiVM.NetboxVM currentApiVM : netboxApiVM.getResults()) {
+            PojoVM pojoVM = netboxMapper.netboxApiVMToPojoVM(currentApiVM, netboxPojoClustersMap);
+            netboxPojoVM.put(pojoVM.getCluster(), pojoVM);
+        }
+        return netboxPojoVM;
     }
 }
