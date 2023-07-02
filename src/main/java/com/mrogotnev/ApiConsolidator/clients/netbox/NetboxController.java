@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 @RestController
 @AllArgsConstructor
@@ -20,7 +21,7 @@ public class NetboxController {
     }
 
     @GetMapping("/getVMs")
-    public HashMap<String, PojoVM> getVMs() {
+    public HashSet<PojoVM> getVMs() {
         return netboxService.getPojoNetboxVM();
     }
 

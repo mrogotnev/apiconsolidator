@@ -13,11 +13,10 @@ import java.util.HashMap;
 @Data
 @Component
 public class NetboxMapper {
-    public PojoVM netboxApiVMToPojoVM(NetboxApiVM.NetboxVM netboxVM, HashMap<String, Long> netboxClustersArrayList) {
+    public PojoVM netboxApiVMToPojoVM(NetboxApiVM.NetboxVM netboxVM) {
         PojoVM pojoVM = new PojoVM();
         pojoVM.setName(netboxVM.getName());
         pojoVM.setCluster(netboxVM.getClusterName());
-        pojoVM.setClusterId(netboxClustersArrayList.get(pojoVM.getCluster()));
         pojoVM.setVcpu(netboxVM.getVcpus());
         pojoVM.setMemory(netboxVM.getMemory());
         pojoVM.setDisk(netboxVM.getDisk());

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 @AllArgsConstructor
 @Data
@@ -21,7 +22,7 @@ public class NetboxService {
     private NetboxMapper netboxMapper;
     private NetboxApiCluster netboxApiCluster;
     private HashMap<String, Long> netboxPojoClustersMap = new HashMap<>();
-    private HashMap<String, PojoVM> netboxPojoVM = new HashMap<>();
+    private HashSet<PojoVM> netboxPojoVM = new HashSet<>();
 
     public NetboxApiCluster getNetboxAPIClusters() {
         netboxApiCluster = webClientWithoutSSL
@@ -59,14 +60,11 @@ public class NetboxService {
         return netboxPojoClustersMap;
     }
 
-    public HashMap<String, PojoVM> getPojoNetboxVM() {
+    public HashSet<PojoVM> getPojoNetboxVM() {
         getNetboxAPIVm();
-        if(netboxPojoClustersMap.isEmpty()) {
-            getPojoNetboxClusters();
-        }
         for (NetboxApiVM.NetboxVM currentApiVM : netboxApiVM.getResults()) {
-            PojoVM pojoVM = netboxMapper.netboxApiVMToPojoVM(currentApiVM, netboxPojoClustersMap);
-            netboxPojoVM.put(pojoVM.getCluster(), pojoVM);
+            PojoVM pojoVM = netboxMapper.netboxApiVMToPojoVM(currentApiVM);
+            netboxPojoVM.add(pojoVM);
         }
         return netboxPojoVM;
     }

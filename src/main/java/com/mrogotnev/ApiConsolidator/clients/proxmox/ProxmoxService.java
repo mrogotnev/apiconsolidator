@@ -1,6 +1,7 @@
 package com.mrogotnev.ApiConsolidator.clients.proxmox;
 
 import com.mrogotnev.ApiConsolidator.clients.proxmox.mappers.ProxmoxMapper;
+import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 
@@ -19,8 +21,8 @@ public class ProxmoxService {
     private ProxmoxCredentials proxmoxCredentials;
     private ProxmoxNodeName proxmoxNodeName;
     private ArrayList<ProxmoxDatacenter> proxmoxDatacenterList = new ArrayList<>();
-    private ProxmoxApiVM proxmoxApiVM;
     private ProxmoxMapper proxmoxMapper;
+    private HashSet<PojoVM> proxmoxPojoVM = new HashSet<>();
 
     public ArrayList<ProxmoxDatacenter> getAllNodeNames() {
         for (ProxmoxCredentials.ProxmoxServer currentServer : proxmoxCredentials.getProxmoxServers()) {
@@ -66,12 +68,20 @@ public class ProxmoxService {
         return proxmoxDatacenterList;
     }
 
-    public HashMap<String, LinkedList<ProxmoxVM>> getVMList() {
+    public HashSet<PojoVM> getVMList() {
         getAllNodeNames();
         proxmoxApiVMArraylists();
         for (ProxmoxDatacenter currentDatacenter : getProxmoxDatacenterList()) {
-            proxmoxMapper.ProxmoxVMApiListToSimpleProxmoxVmHashMap(currentDatacenter);
+            for (ProxmoxNode currentNode : currentDatacenter.getProxmoxNodes()) {
+                for (ProxmoxApiVM currentApiVM : currentNode.getVmArrayList())
+                    for (ProxmoxApiVM.ProxmoxVM currentVM : currentApiVM.getData()) {
+                        PojoVM currentPojoVM = proxmoxMapper.proxmoxApiVMToPojoVM(currentVM, currentNode.getName());
+                        proxmoxPojoVM.add(currentPojoVM);
+                    }
+            }
         }
-        return proxmoxMapper.getProxmoxVMHashMap();
+        return proxmoxPojoVM;
     }
+
 }
+
