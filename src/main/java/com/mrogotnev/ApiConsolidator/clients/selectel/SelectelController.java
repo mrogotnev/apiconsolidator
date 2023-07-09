@@ -13,4 +13,10 @@ public class SelectelController {
     public String getSelectelToken() {
         return selectelService.getSelectelToken();
     }
+
+    @GetMapping("/getStringData")
+    public SelectelApiVMData getStringData() {
+        SelectelApiVMData selectelApiVMData = selectelService.getVMList();
+        return selectelApiVMData;
+    }
 }
