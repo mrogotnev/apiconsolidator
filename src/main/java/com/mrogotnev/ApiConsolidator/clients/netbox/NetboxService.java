@@ -21,10 +21,9 @@ public class NetboxService {
     private NetboxApiVM netboxApiVM;
     private NetboxMapper netboxMapper;
     private NetboxApiCluster netboxApiCluster;
-    private HashMap<String, Long> netboxPojoClustersMap = new HashMap<>();
-    private HashSet<PojoVM> netboxPojoVM = new HashSet<>();
+    private HashMap<String, Long> netboxPojoClustersMap;
 
-    public NetboxApiCluster getNetboxAPIClusters() {
+    /*public NetboxApiCluster getNetboxAPIClusters() {
         netboxApiCluster = webClientWithoutSSL
                 .get()
                 .uri("https://" +
@@ -36,7 +35,8 @@ public class NetboxService {
                 .bodyToMono(NetboxApiCluster.class)
                 .block();
         return netboxApiCluster;
-    }
+    }*/
+
     public NetboxApiVM getNetboxAPIVm() {
         netboxApiVM = webClientWithoutSSL
                 .get()
@@ -51,17 +51,18 @@ public class NetboxService {
         return netboxApiVM;
     }
 
-    public HashMap<String, Long> getPojoNetboxClusters() {
+    /*public HashMap<String, Long> getPojoNetboxClusters() {
         getNetboxAPIClusters();
         for (NetboxApiCluster.ApiCluster currentApiCluster : netboxApiCluster.getResults()) {
             PojoNetboxCluster cluster = netboxMapper.netboxApiClusterToNetboxCluster(currentApiCluster);
             netboxPojoClustersMap.put(cluster.getName(), cluster.getId());
         }
         return netboxPojoClustersMap;
-    }
+    }*/
 
     public HashSet<PojoVM> getPojoNetboxVM() {
         getNetboxAPIVm();
+        HashSet<PojoVM> netboxPojoVM = new HashSet<>();
         for (NetboxApiVM.NetboxVM currentApiVM : netboxApiVM.getResults()) {
             PojoVM pojoVM = netboxMapper.netboxApiVMToPojoVM(currentApiVM);
             netboxPojoVM.add(pojoVM);

@@ -15,10 +15,10 @@ import java.util.HashSet;
 public class NetboxController {
     private NetboxService netboxService;
 
-    @GetMapping("/getClusters")
+/*    @GetMapping("/getClusters")
     public HashMap<String, Long> getClusters() {
         return netboxService.getPojoNetboxClusters();
-    }
+    }*/
 
     @GetMapping("/getVMs")
     public HashSet<PojoVM> getVMs() {

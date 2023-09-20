@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class ProxmoxMapper {
     public PojoVM proxmoxApiVMToPojoVM(ProxmoxApiVM.ProxmoxVM proxmoxApiVM, String clusterName) {
         PojoVM pojoVM = new PojoVM();
+        pojoVM.setIdFromOutSystems(proxmoxApiVM.getVmid());
         pojoVM.setName(proxmoxApiVM.getName());
         pojoVM.setCluster(clusterName);
         pojoVM.setVcpu(proxmoxApiVM.getCpus());

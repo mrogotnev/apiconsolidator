@@ -19,7 +19,7 @@ public class ProxmoxApiVM {
     @JsonIgnoreProperties(value = {"diskread", "diskwrite", "disk", "pid", "netin", "cpu", "netout", "uptime", "mem"})
     public static class ProxmoxVM {
         private String name;
-        private String vmid;
+        private long vmid;
         private long maxdisk;
         private long maxmem;
         private double cpus;

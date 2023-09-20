@@ -3,14 +3,15 @@ package com.mrogotnev.ApiConsolidator.clients.teampass;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mrogotnev.ApiConsolidator.clients.teampass.mappers.TeampassMapper;
+import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @AllArgsConstructor
 @Data
@@ -18,7 +19,8 @@ import java.util.List;
 public class TeampassService {
     private TeampassCredentials teampassCredentials;
     private final WebClient webClientWithoutSSL;
-    private HashSet<String> teampassFolders = new HashSet<>();
+    private LinkedList<String> teampassFolders;
+    private TeampassMapper teampassMapper;
 
     public List<TeampassFolderApi> getApiData() throws JsonProcessingException {
         List<TeampassFolderApi> allData = new ArrayList<>();
@@ -32,21 +34,46 @@ public class TeampassService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            TypeReference<List<TeampassFolderApi>> typeReference = new TypeReference<List<TeampassFolderApi>>() {};
+            TypeReference<List<TeampassFolderApi>> typeReference = new TypeReference<>() {};
             allData.addAll(objectMapper.readValue(json, typeReference));
         }
         return allData;
     }
 
-    public HashSet<String> getFoldersName() throws JsonProcessingException {
-        for (TeampassFolderApi currentFolder : getApiData()) {
-            teampassFolders.add(currentFolder.getTitle());
+    public HashSet<PojoVM> getFoldersName() throws JsonProcessingException {
+        List<TeampassFolderApi> teampassFoldersApi = getApiData();
+        HashMap<Long, String> clusters = new HashMap<>();
+        ArrayList<String> listOfClustersName = teampassCredentials.getFoldersName();
+        HashSet<PojoVM> resultSet = new HashSet<>();
+        for (TeampassFolderApi currentFolder : teampassFoldersApi) {
+            for (String currentNameFromCred : listOfClustersName) {
+                if (currentFolder.getTitle().equals(currentNameFromCred)) {
+                    clusters.put(currentFolder.getId(), currentFolder.getTitle());
+                }
+            }
         }
-        for (String nameFromCredentials : teampassCredentials.getFoldersName()) {
-            teampassFolders.remove(nameFromCredentials);
+
+        for (TeampassFolderApi currentFolder : teampassFoldersApi) {
+            if (!clusters.containsKey(currentFolder.getId())) {
+                if (!clusters.containsKey(currentFolder.getParent_id())) {
+                    currentFolder = getParentIDFromClusters(currentFolder, clusters, teampassFoldersApi);
+                }
+                resultSet.add(teampassMapper.teampassFolderToPojoVM(currentFolder, clusters.get(currentFolder.getParent_id())));
+            }
         }
-        return teampassFolders;
+
+
+        return resultSet;
     }
 
-
+    public TeampassFolderApi getParentIDFromClusters(TeampassFolderApi currentFolder, HashMap<Long, String> clusters, List<TeampassFolderApi> teampassFoldersApi) {
+        if (!clusters.containsKey(currentFolder.getParent_id())) {
+            currentFolder.setParent_id(teampassFoldersApi.stream()
+                    .filter(folderFromList -> folderFromList.getId() == currentFolder.getParent_id())
+                    .findAny()
+                    .get().getParent_id());
+            getParentIDFromClusters(currentFolder, clusters, teampassFoldersApi);
+        }
+        return currentFolder;
+    }
 }

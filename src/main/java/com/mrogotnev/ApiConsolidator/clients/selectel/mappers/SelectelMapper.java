@@ -11,7 +11,7 @@ public class SelectelMapper {
     public PojoVM selectelApiVMToPojo(SelectelApiVMData.SelectelApiVm selectelApiVm) {
         PojoVM pojoVM = new PojoVM();
         pojoVM.setName(selectelApiVm.getName());
-        pojoVM.setCluster("Selectel");
+        pojoVM.setCluster("selectel");
         pojoVM.setStatus(selectelApiVm.getStatus());
         pojoVM.setMemory(selectelApiVm.getMemoryMB());
         pojoVM.setVcpu(selectelApiVm.getNumberOfCpus());

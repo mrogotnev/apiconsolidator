@@ -11,5 +11,4 @@ public class TeampassFolderApi {
     private long nright;
     private int nlevel;
     private int personal;
-
 }
