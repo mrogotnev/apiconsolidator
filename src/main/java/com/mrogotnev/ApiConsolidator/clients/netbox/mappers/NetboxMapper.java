@@ -1,23 +1,21 @@
 package com.mrogotnev.ApiConsolidator.clients.netbox.mappers;
 
-import com.mrogotnev.ApiConsolidator.clients.netbox.NetboxCredentials;
-import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import com.mrogotnev.ApiConsolidator.clients.netbox.NetboxApiCluster;
 import com.mrogotnev.ApiConsolidator.clients.netbox.NetboxApiVM;
+import com.mrogotnev.ApiConsolidator.clients.netbox.NetboxCredentials;
 import com.mrogotnev.ApiConsolidator.dto.PojoNetboxCluster;
+import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
 @Component
 @AllArgsConstructor
 public class NetboxMapper {
-    private NetboxCredentials netboxCredentials;
-    public PojoVM netboxApiVMToPojoVM(NetboxApiVM.NetboxVM netboxVM) {
+    public PojoVM netboxApiVMToPojoVM(NetboxApiVM.NetboxVM netboxVM, NetboxCredentials netboxCredentials) {
         PojoVM pojoVM = new PojoVM();
         pojoVM.setName(netboxVM.getName().toLowerCase());
 

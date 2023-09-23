@@ -7,7 +7,6 @@ import com.mrogotnev.ApiConsolidator.clients.teampass.mappers.TeampassMapper;
 import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -22,7 +21,7 @@ public class TeampassService {
     private LinkedList<String> teampassFolders;
     private TeampassMapper teampassMapper;
 
-    public List<TeampassFolderApi> getApiData() throws JsonProcessingException {
+    public List<TeampassFolderApi> getApiData() {
         List<TeampassFolderApi> allData = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         for (String currentFolderFromConfig : teampassCredentials.getFoldersName()) {
@@ -35,35 +34,41 @@ public class TeampassService {
                     .bodyToMono(String.class)
                     .block();
             TypeReference<List<TeampassFolderApi>> typeReference = new TypeReference<>() {};
-            allData.addAll(objectMapper.readValue(json, typeReference));
+            try {
+                allData.addAll(objectMapper.readValue(json, typeReference));
+            } catch (JsonProcessingException e) {
+                System.out.println("JsonProcessingException in TeamPassService.class");
+                throw new RuntimeException(e);
+            }
         }
         return allData;
     }
 
-    public HashSet<PojoVM> getFoldersName() throws JsonProcessingException {
-        List<TeampassFolderApi> teampassFoldersApi = getApiData();
-        HashMap<Long, String> clusters = new HashMap<>();
-        ArrayList<String> listOfClustersName = teampassCredentials.getFoldersName();
-        HashSet<PojoVM> resultSet = new HashSet<>();
-        for (TeampassFolderApi currentFolder : teampassFoldersApi) {
-            for (String currentNameFromCred : listOfClustersName) {
-                if (currentFolder.getTitle().equals(currentNameFromCred)) {
-                    clusters.put(currentFolder.getId(), currentFolder.getTitle());
+    public HashSet<PojoVM> getFoldersName() {
+        if (teampassCredentials.getUrl() != null) {
+            List<TeampassFolderApi> teampassFoldersApi = getApiData();
+            HashMap<Long, String> clusters = new HashMap<>();
+            ArrayList<String> listOfClustersName = teampassCredentials.getFoldersName();
+            HashSet<PojoVM> resultSet = new HashSet<>();
+            for (TeampassFolderApi currentFolder : teampassFoldersApi) {
+                for (String currentNameFromCred : listOfClustersName) {
+                    if (currentFolder.getTitle().equals(currentNameFromCred)) {
+                        clusters.put(currentFolder.getId(), currentFolder.getTitle());
+                    }
                 }
             }
-        }
 
-        for (TeampassFolderApi currentFolder : teampassFoldersApi) {
-            if (!clusters.containsKey(currentFolder.getId())) {
-                if (!clusters.containsKey(currentFolder.getParent_id())) {
-                    currentFolder = getParentIDFromClusters(currentFolder, clusters, teampassFoldersApi);
+            for (TeampassFolderApi currentFolder : teampassFoldersApi) {
+                if (!clusters.containsKey(currentFolder.getId())) {
+                    if (!clusters.containsKey(currentFolder.getParent_id())) {
+                        currentFolder = getParentIDFromClusters(currentFolder, clusters, teampassFoldersApi);
+                    }
+                    resultSet.add(teampassMapper.teampassFolderToPojoVM(currentFolder, clusters.get(currentFolder.getParent_id())));
                 }
-                resultSet.add(teampassMapper.teampassFolderToPojoVM(currentFolder, clusters.get(currentFolder.getParent_id())));
             }
+            return resultSet;
         }
-
-
-        return resultSet;
+        return new HashSet<>();
     }
 
     public TeampassFolderApi getParentIDFromClusters(TeampassFolderApi currentFolder, HashMap<Long, String> clusters, List<TeampassFolderApi> teampassFoldersApi) {

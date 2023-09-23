@@ -8,9 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 
 @AllArgsConstructor
@@ -20,36 +18,34 @@ public class ProxmoxService {
     private final WebClient webClientWithoutSSL;
     private ProxmoxCredentials proxmoxCredentials;
     private ProxmoxNodeName proxmoxNodeName;
-    private ArrayList<ProxmoxDatacenter> proxmoxDatacenterList = new ArrayList<>();
+    private ArrayList<ProxmoxDatacenter> proxmoxDatacenterList;
     private ProxmoxMapper proxmoxMapper;
-    private HashSet<PojoVM> proxmoxPojoVM = new HashSet<>();
+    private HashSet<PojoVM> proxmoxPojoVM;
 
-    public ArrayList<ProxmoxDatacenter> getAllNodeNames() {
+    public void getAllNodeNames() {
         for (ProxmoxCredentials.ProxmoxServer currentServer : proxmoxCredentials.getProxmoxServers()) {
-            proxmoxNodeName = webClientWithoutSSL
-                    .get()
-                    .uri("https://" + currentServer.getIp() + ":" + currentServer.getPort() + "/api2/json/cluster/status")
-                    .header("Authorization", "PVEAPIToken=" +
-                            currentServer.getUserLogin() + "!" +
-                            currentServer.getTokenID() + "=" +
-                            currentServer.getTokenKey())
-                    .retrieve()
-                    .bodyToMono(ProxmoxNodeName.class)
-                    .block();
-            proxmoxDatacenterList.add(new ProxmoxDatacenter(currentServer, proxmoxNodeName));
-
+                proxmoxNodeName = webClientWithoutSSL
+                        .get()
+                        .uri(currentServer.getIp() + ":" + currentServer.getPort() + "/api2/json/cluster/status")
+                        .header("Authorization", "PVEAPIToken=" +
+                                currentServer.getUserLogin() + "!" +
+                                currentServer.getTokenID() + "=" +
+                                currentServer.getTokenKey())
+                        .retrieve()
+                        .bodyToMono(ProxmoxNodeName.class)
+                        .block();
+                proxmoxDatacenterList.add(new ProxmoxDatacenter(currentServer, proxmoxNodeName));
         }
-        return proxmoxDatacenterList;
     }
 
-    public ArrayList<ProxmoxDatacenter> proxmoxApiVMArraylists() {
+    public void proxmoxApiVMArraylists() {
         for (ProxmoxDatacenter currentDatacenter : proxmoxDatacenterList) {
             for (ProxmoxNodeName.Data currentData : currentDatacenter.getProxmoxNodeName().getData()) {
                 ProxmoxNode proxmoxNode = new ProxmoxNode(currentData.getName());
-                ProxmoxApiVM proxmoxApiVM = new ProxmoxApiVM();
+                ProxmoxApiVM proxmoxApiVM;
                 proxmoxApiVM = webClientWithoutSSL
                         .get()
-                        .uri("https://" + currentDatacenter.getProxmoxServer().getIp() +
+                        .uri(currentDatacenter.getProxmoxServer().getIp() +
                                 ":" + currentDatacenter.getProxmoxServer().getPort() +
                                 "/api2/json/nodes/" +
                                 currentData.getName() +
@@ -65,19 +61,20 @@ public class ProxmoxService {
                 currentDatacenter.getProxmoxNodes().add(proxmoxNode);
             }
         }
-        return proxmoxDatacenterList;
     }
 
     public HashSet<PojoVM> getVMList() {
-        getAllNodeNames();
-        proxmoxApiVMArraylists();
-        for (ProxmoxDatacenter currentDatacenter : getProxmoxDatacenterList()) {
-            for (ProxmoxNode currentNode : currentDatacenter.getProxmoxNodes()) {
-                for (ProxmoxApiVM currentApiVM : currentNode.getVmArrayList())
-                    for (ProxmoxApiVM.ProxmoxVM currentVM : currentApiVM.getData()) {
-                        PojoVM currentPojoVM = proxmoxMapper.proxmoxApiVMToPojoVM(currentVM, currentNode.getName());
-                        proxmoxPojoVM.add(currentPojoVM);
-                    }
+        if (proxmoxCredentials.getProxmoxServers() != null) {
+            getAllNodeNames();
+            proxmoxApiVMArraylists();
+            for (ProxmoxDatacenter currentDatacenter : getProxmoxDatacenterList()) {
+                for (ProxmoxNode currentNode : currentDatacenter.getProxmoxNodes()) {
+                    for (ProxmoxApiVM currentApiVM : currentNode.getVmArrayList())
+                        for (ProxmoxApiVM.ProxmoxVM currentVM : currentApiVM.getData()) {
+                            PojoVM currentPojoVM = proxmoxMapper.proxmoxApiVMToPojoVM(currentVM, currentNode.getName());
+                            proxmoxPojoVM.add(currentPojoVM);
+                        }
+                }
             }
         }
         return proxmoxPojoVM;

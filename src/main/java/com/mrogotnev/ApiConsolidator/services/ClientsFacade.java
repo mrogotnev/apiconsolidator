@@ -1,6 +1,5 @@
 package com.mrogotnev.ApiConsolidator.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mrogotnev.ApiConsolidator.clients.netbox.NetboxService;
 import com.mrogotnev.ApiConsolidator.clients.proxmox.ProxmoxService;
 import com.mrogotnev.ApiConsolidator.clients.selectel.SelectelService;
@@ -10,10 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
 
 @AllArgsConstructor
 @Data
@@ -35,7 +31,7 @@ public class ClientsFacade {
         return new HashSet<>(netboxService.getPojoNetboxVM());
     }
 
-    public HashSet<PojoVM> getTeampassSet() throws JsonProcessingException {
+    public HashSet<PojoVM> getTeampassSet() {
         return teampassService.getFoldersName();
     }
 }

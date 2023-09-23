@@ -2,7 +2,6 @@ package com.mrogotnev.ApiConsolidator.clients.netbox;
 
 
 import com.mrogotnev.ApiConsolidator.clients.netbox.mappers.NetboxMapper;
-import com.mrogotnev.ApiConsolidator.dto.PojoNetboxCluster;
 import com.mrogotnev.ApiConsolidator.dto.PojoVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,25 +22,10 @@ public class NetboxService {
     private NetboxApiCluster netboxApiCluster;
     private HashMap<String, Long> netboxPojoClustersMap;
 
-    /*public NetboxApiCluster getNetboxAPIClusters() {
-        netboxApiCluster = webClientWithoutSSL
-                .get()
-                .uri("https://" +
-                        netboxCredentials.getIp() + ":" +
-                        netboxCredentials.getPort() +
-                        "/api/virtualization/clusters/?limit=0")
-                .header("Authorization", "TOKEN " + netboxCredentials.getToken())
-                .retrieve()
-                .bodyToMono(NetboxApiCluster.class)
-                .block();
-        return netboxApiCluster;
-    }*/
-
     public NetboxApiVM getNetboxAPIVm() {
         netboxApiVM = webClientWithoutSSL
                 .get()
-                .uri("https://" +
-                        netboxCredentials.getIp() + ":" +
+                .uri(netboxCredentials.getIp() + ":" +
                         netboxCredentials.getPort() +
                         "/api/virtualization/virtual-machines/?limit=0")
                 .header("Authorization", "TOKEN " + netboxCredentials.getToken())
@@ -51,22 +35,16 @@ public class NetboxService {
         return netboxApiVM;
     }
 
-    /*public HashMap<String, Long> getPojoNetboxClusters() {
-        getNetboxAPIClusters();
-        for (NetboxApiCluster.ApiCluster currentApiCluster : netboxApiCluster.getResults()) {
-            PojoNetboxCluster cluster = netboxMapper.netboxApiClusterToNetboxCluster(currentApiCluster);
-            netboxPojoClustersMap.put(cluster.getName(), cluster.getId());
-        }
-        return netboxPojoClustersMap;
-    }*/
-
     public HashSet<PojoVM> getPojoNetboxVM() {
-        getNetboxAPIVm();
-        HashSet<PojoVM> netboxPojoVM = new HashSet<>();
-        for (NetboxApiVM.NetboxVM currentApiVM : netboxApiVM.getResults()) {
-            PojoVM pojoVM = netboxMapper.netboxApiVMToPojoVM(currentApiVM);
-            netboxPojoVM.add(pojoVM);
+        if (netboxCredentials.getIp() != null) {
+            getNetboxAPIVm();
+            HashSet<PojoVM> netboxPojoVM = new HashSet<>();
+            for (NetboxApiVM.NetboxVM currentApiVM : netboxApiVM.getResults()) {
+                PojoVM pojoVM = netboxMapper.netboxApiVMToPojoVM(currentApiVM, netboxCredentials);
+                netboxPojoVM.add(pojoVM);
+            }
+            return netboxPojoVM;
         }
-        return netboxPojoVM;
+        return new HashSet<>();
     }
 }

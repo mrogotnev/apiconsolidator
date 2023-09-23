@@ -17,7 +17,7 @@ public class SelectelService {
     private SelectelCredentials selectelCredentials;
     private final WebClient webClientWithoutSSL;
     private SelectelMapper selectelMapper;
-    private HashSet<PojoVM> selectelPojoVM = new HashSet<>();
+    private HashSet<PojoVM> selectelPojoVM;
 
     public String getSelectelToken() {
         ResponseEntity<String> response = webClientWithoutSSL
@@ -48,9 +48,11 @@ public class SelectelService {
     }
 
     public HashSet<PojoVM> getSelectelPojoVM() {
-        for (SelectelApiVMData.SelectelApiVm currentVM : getVMList().getRecord()) {
-            PojoVM pojoVM = selectelMapper.selectelApiVMToPojo(currentVM);
-            selectelPojoVM.add(pojoVM);
+        if (selectelCredentials.getLoginUrl() != null) {
+            for (SelectelApiVMData.SelectelApiVm currentVM : getVMList().getRecord()) {
+                PojoVM pojoVM = selectelMapper.selectelApiVMToPojo(currentVM);
+                selectelPojoVM.add(pojoVM);
+            }
         }
         return selectelPojoVM;
     }
